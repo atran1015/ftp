@@ -1,9 +1,16 @@
-note to team:
-feel free to edit/replace files as needed
+User Two terminals to run both of file
 
-to run cli.py:
-python cli.py serv.py PORTNUMBER
-*serv.py to be fixed with server machine (ecs.fullerton.edu)
+Run server.py first:
 
-to run serv.py:
-python serv.py PORTNUMBER
+python server.py PORTNUMBER
+
+Run client.py
+
+python client.py localhost PORTNUMBER (works but that's not what we need)
+
+Need to be fixed:
+python client.py ecs.fullerton.edu PORTNUMBER
+
+is not working
+
+
