@@ -1,4 +1,4 @@
-User Two terminals to run both of file
+User Two terminals to run both
 
 Run server.py first:
 
