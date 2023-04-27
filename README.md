@@ -2,6 +2,8 @@ Group Members:
 
 Zhibin Ren zhibinren79@gmail.com
 
+Joseph Cardenas joey.cardenas@outlook.com
+
 
 Language used: Python
 
