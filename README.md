@@ -4,6 +4,8 @@ Zhibin Ren zhibinren79@gmail.com
 
 Joseph Cardenas joey.cardenas@outlook.com
 
+Ai Chan Tran aichantran@csu.fullerton.edu
+
 
 Language used: Python
 
