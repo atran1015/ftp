@@ -7,3 +7,10 @@ python cli.py serv.py PORTNUMBER
 
 to run serv.py:
 python serv.py PORTNUMBER
+
+
+BRANCH NOTES:
+
+- Handled some exception errors on cli.py
+
+- Attempted to fix send() function to ensure no bytes are lost in trasmission.
