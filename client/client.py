@@ -43,24 +43,25 @@ while True:
         
     elif cmd == 'put':
         filename = command_list[1]
-        client_socket.sendall(f'put {filename}'.encode())
         
-        if not os.path.exists(filename):
-            print(f"File '{filename}' does not exist.")
-            continue
         
-        filesize = os.path.getsize(filename)
+        # check if file exists
+        if os.path.exists(filename):
+            client_socket.sendall(f'put {filename}'.encode())
+            filesize = os.path.getsize(filename)
         
-        client_socket.send(str(filesize).encode())
-        
-        with open(filename, 'rb') as file:
-            data = file.read(1024)
-            while data:
-                client_socket.send(data)
+            client_socket.send(str(filesize).encode())
+            with open(filename, 'rb') as file:
                 data = file.read(1024)
-                
+                while data:
+                    client_socket.send(data)
+                    data = file.read(1024)
             print(f'Upload complete. {filesize} bytes sent.')
-        
+        # if file doesn't exist
+        else:
+            print(f"File '{filename}' does not exist.")
+            #continue
+            
     elif cmd == 'ls':
         client_socket.sendall('ls'.encode())
 
