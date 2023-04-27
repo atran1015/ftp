@@ -1,16 +1,27 @@
+Group Members:
+
+Zhibin Ren zhibinren79@gmail.com
+
+
+Language used: Python
+
+How to run:
 User Two terminals to run both
 
-Run server.py first:
+To run server.py:
 
 python server.py PORTNUMBER
 
-Run client.py
+To run client.py
 
-python client.py localhost PORTNUMBER (works but that's not what we need)
+python client.py localhost PORTNUMBER
 
-Need to be fixed:
-python client.py ecs.fullerton.edu PORTNUMBER
 
-is not working
+Notes about our progaram:
+
+Things to do after coding part is done:
+
+push everything into one folder then tar it
+
 
 
