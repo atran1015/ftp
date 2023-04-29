@@ -6,6 +6,8 @@ Joseph Cardenas joey.cardenas@outlook.com
 
 Ai Chan Tran aichantran@csu.fullerton.edu
 
+Brandon Capparelli brandon.capparelli@csu.fullerton.edu
+
 
 Language used: Python
 
