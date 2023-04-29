@@ -8,6 +8,8 @@ Ai Chan Tran aichantran@csu.fullerton.edu
 
 Brandon Capparelli brandon.capparelli@csu.fullerton.edu
 
+Adrian Perez aperez285@csu.fullerton.edu
+
 
 Language used: Python
 
