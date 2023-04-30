@@ -1,8 +1,11 @@
 import socket
 import os
 import sys
+from string import digits
+from pathlib import Path
 
 def send_file(conn, filename):
+    """ For get method """
     filesize = os.path.getsize(filename)
     conn.send(str(filesize).encode())
 
@@ -11,25 +14,38 @@ def send_file(conn, filename):
         while data:
             conn.send(data)
             data = file.read(1024)
+    
 
 def receive_file(conn, filename):
-    filesize = int(conn.recv(1024).decode())
+    """ For put method """
+    try:
+        #print("this is filename: ", filename)
 
-    # save
-    with open(filename, 'wb') as file:
-        received = 0
-        while received < filesize:
-            data = conn.recv(1024)
-            received += len(data)
-            file.write(data)
+        # get dynamic file path and get filesize from file that belongs to client folder
+        root_folder = Path(__file__).parents[1]
+        my_path = str(root_folder)+ "/client/" + filename
+        filesize = os.path.getsize(my_path)
+        #filesize = int(float(conn.recv(1024).decode()))
+        #print("this is filesize: ", filesize)
+        
+        with open(filename, 'wb') as file:
+            received = 0
+            while received < filesize:
+                data = conn.recv(1024)
+                received += len(data)
+                file.write(data)
+        
+        print("SUCCESS")
+    except Exception as e:
+        # catch all errors to prevent crashing
+        print("FAILURE")
+        print("Error encountered: ", str(e))
+        
 
 def main(port):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind(('', port))
-
     server_socket.listen(1)
-
-    # wait for connection
     
     print('Waiting for a client to connect...')
     conn, address = server_socket.accept()
@@ -45,14 +61,43 @@ def main(port):
 
             print(f'Sent {filename} to client')
         elif command.startswith('put'):
+            
             filename = command.split(' ')[1]
-            receive_file(conn, filename)
+            # get extension of filename
+            extension = filename.split(".")[-1]
+            #print("this is file extension: ", extension)
 
-            print(f'Received {filename} from client')
+            logicBool = False
+
+            # check if extension contains digit, meaning bytes is being attached to extension "txt42"
+            for i in extension:
+                if i.isdigit():
+                    logicBool = True
+
+            # if extension does contain digit
+            if logicBool:
+                #print("filename contains digit")
+               
+                # remove the digits from the extension
+                remove_digits = str.maketrans('', '', digits)
+                res = extension.translate(remove_digits)
+                # rejoin the strings together without the digits
+                join_string = filename.split(".")[0] + "." + res
+                #print("new string", join_string)
+                receive_file(conn, join_string)
+                print(f'Received {join_string} from client')
+            else:
+                receive_file(conn, filename)
+                print(f'Received {filename} from client')
+
+
+            
         elif command == 'ls':
             file_list = os.listdir('.')
+            print("SUCCESS")
             conn.send('\n'.join(file_list).encode())
         elif command == 'quit':
+            print("SUCCESS")
             break
 
     conn.close()
