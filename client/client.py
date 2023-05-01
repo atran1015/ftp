@@ -64,7 +64,6 @@ while True:
             continue
 
         try:
-            print("pass3")
             with open(f'received_{filename}', 'wb') as file:
                 received = 0
                 while received < filesize:
@@ -73,7 +72,7 @@ while True:
                         break
                     received += len(data)
                     file.write(data)
-
+            print(f'file name is: ', filename)
             print(f'Download complete. {filesize} bytes received.')
         except (OSError, socket.error) as e:
             print("Error saving file:", e)
@@ -104,7 +103,7 @@ while True:
                 while data:
                     client_socket.send(data)
                     data = file.read(1024)
-
+            print(f'file name is: ', filename)
             print(f'Upload complete. {filesize} bytes sent.')
         except (OSError, socket.error) as e:
             print("Error reading file:", e)
