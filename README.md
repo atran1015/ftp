@@ -14,7 +14,7 @@ Adrian Perez aperez285@csu.fullerton.edu
 Language used: Python
 
 How to run:
-User Two terminals to run both
+Use two terminals to run client.py and server.py separately
 
 To run server.py:
 
@@ -25,11 +25,7 @@ To run client.py
 python client.py localhost PORTNUMBER
 
 
-Notes about our progaram:
-
-Things to do after coding part is done:
-
-push everything into one folder then tar it
+Notes about our program: None
 
 
 
