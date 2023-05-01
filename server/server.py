@@ -5,16 +5,28 @@ from string import digits
 from pathlib import Path
 
 def send_file(conn, filename):
-    """ For get method """
-    filesize = os.path.getsize(filename)
-    conn.send(str(filesize).encode())
+    # if file does exist
+    if os.path.exists(filename):
+        # do this
+        try:
+            filesize = os.path.getsize(filename)
+            conn.send(str(filesize).encode())
 
-    with open(filename, 'rb') as file:
-        data = file.read(1024)
-        while data:
-            conn.send(data)
-            data = file.read(1024)
-    
+            with open(filename, 'rb') as file:
+                data = file.read(1024)
+                while data:
+                    sent = conn.send(data)
+                    data = file.read(1024 - sent)
+                print(f"File '{filename}' sent.")
+            print("SUCCESS")
+        # handle get error
+        except Exception as e:
+            print("Get Error: ", str(e))
+            print("FAILURE")
+    # if file doesn't exist, send error string
+    else:
+        conn.send(str("ERROR").encode())
+        print("FAILURE")
 
 def receive_file(conn, filename):
     """ For put method """
@@ -25,8 +37,6 @@ def receive_file(conn, filename):
         root_folder = Path(__file__).parents[1]
         my_path = str(root_folder)+ "/client/" + filename
         filesize = os.path.getsize(my_path)
-        #filesize = int(float(conn.recv(1024).decode()))
-        #print("this is filesize: ", filesize)
         
         with open(filename, 'wb') as file:
             received = 0
@@ -40,68 +50,75 @@ def receive_file(conn, filename):
         # catch all errors to prevent crashing
         print("FAILURE")
         print("Error encountered: ", str(e))
-        
 
 def main(port):
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind(('', port))
-    server_socket.listen(1)
-    
-    print('Waiting for a client to connect...')
-    conn, address = server_socket.accept()
+    try:
+        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server_socket.bind(('', port))
+        server_socket.listen(1)
 
-    print(f'Connection established with {address}')
+        # wait for connection
+        print('Waiting for a client to connect...')
+        conn, address = server_socket.accept()
+        print(f'Connection established with {address}')
 
-    while True:
-        command = conn.recv(1024).decode()
+        while True:
+            command = conn.recv(1024).decode()
 
-        if command.startswith('get'):
-            filename = command.split(' ')[1]
-            send_file(conn, filename)
+            if command.startswith('get'):
+                filename = command.split(' ')[1]
+                
+                try:
+                    send_file(conn, filename)
+                except FileNotFoundError:
+                    conn.send(b'File not found.')
+                except Exception as e:
+                    conn.send(str(e).encode())
+            elif command.startswith('put'):
 
-            print(f'Sent {filename} to client')
-        elif command.startswith('put'):
-            
-            filename = command.split(' ')[1]
-            # get extension of filename
-            extension = filename.split(".")[-1]
-            #print("this is file extension: ", extension)
+                filename = command.split(' ')[1]
+                # get extension of filename
+                extension = filename.split(".")[-1]
+                #print("this is file extension: ", extension)
 
-            logicBool = False
+                logicBool = False
+                # check if extension contains digit, meaning bytes is being attached to extension "txt42"
+                for i in extension:
+                    if i.isdigit():
+                        logicBool = True
 
-            # check if extension contains digit, meaning bytes is being attached to extension "txt42"
-            for i in extension:
-                if i.isdigit():
-                    logicBool = True
-
-            # if extension does contain digit
-            if logicBool:
-                #print("filename contains digit")
+                # if extension does contain digit
+                if logicBool:
+                    #print("filename contains digit")
                
-                # remove the digits from the extension
-                remove_digits = str.maketrans('', '', digits)
-                res = extension.translate(remove_digits)
-                # rejoin the strings together without the digits
-                join_string = filename.split(".")[0] + "." + res
-                #print("new string", join_string)
-                receive_file(conn, join_string)
-                print(f'Received {join_string} from client')
-            else:
-                receive_file(conn, filename)
-                print(f'Received {filename} from client')
+                    # remove the digits from the extension
+                    remove_digits = str.maketrans('', '', digits)
+                    res = extension.translate(remove_digits)
+                    # rejoin the strings together without the digits
+                    join_string = filename.split(".")[0] + "." + res                
+                    try:
+                        receive_file(conn, join_string)
+                    except Exception as e:
+                        conn.send(str(e).encode())
+                else:
+                    try:
+                        receive_file(conn, filename)
+                    except Exception as e:
+                        conn.send(str(e).encode())
 
+            elif command == 'ls':
+                file_list = os.listdir('.')
+                print("SUCCESS")
+                conn.send('\n'.join(file_list).encode())
+            elif command == 'quit':
+                print("SUCCESS")
+                break
 
-            
-        elif command == 'ls':
-            file_list = os.listdir('.')
-            print("SUCCESS")
-            conn.send('\n'.join(file_list).encode())
-        elif command == 'quit':
-            print("SUCCESS")
-            break
-
-    conn.close()
-    server_socket.close()
+        conn.close()
+    except Exception as e:
+        print(f"Error: {e}")
+    finally:
+        server_socket.close()
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
